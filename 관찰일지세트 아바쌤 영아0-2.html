@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>아바쌤 영아 관찰일지 생성기 (만0~만2세) ver.5</title>
+  <style>
+    :root{
+      --bg:#faf7fb;
+      --card:#ffffff;
+      --ink:#1f1f1f;
+      --muted:#666;
+      --accent:#d12f7a;
+      --line:#e8e1ea;
+      --chip:#f6e6f0;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:18px;}
+    header{
+      background:linear-gradient(90deg,#fff, #fff0f7);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px 18px;
+      margin-bottom:14px;
+    }
+    h1{margin:0 0 6px;font-size:20px;}
+    .desc{margin:0;color:var(--muted);font-size:13px;line-height:1.5;}
+    .grid{display:grid;grid-template-columns: 1fr 1fr;gap:14px;}
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    select, textarea, input[type="text"]{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 10px;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus{
+      border-color:#f0a7ca;
+      box-shadow:0 0 0 3px rgba(209,47,122,.12);
+    }
+    textarea{width:100%;min-height:140px;resize:vertical;line-height:1.55}
+    .col{flex:1;min-width:150px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{
+      border:0;border-radius:12px;
+      padding:12px 14px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .primary{background:var(--accent);color:white;}
+    .ghost{background:#fff;border:1px solid var(--line);color:var(--ink);}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{
+      background:var(--chip);
+      border:1px solid #f0cadd;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:#8a1e52;
+      font-weight:700;
+    }
+    .out h2{margin:0 0 8px;font-size:16px;}
+    .out .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+    .section{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+    .section h3{margin:0 0 8px;font-size:14px}
+    .box{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      line-height:1.65;
+      white-space:pre-wrap;
+      font-size:14px;
+    }
+    .small{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+    .radio{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px
+    }
+    .radio label{
+      margin:0;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      background:#fff;
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      color:var(--ink);
+    }
+    .radio input{accent-color:var(--accent)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>아바쌤 영아 관찰일지 생성기 (만0~만2세) ver.5</h1>
+    <p class="desc">
+      입력은 <b>연령·성별·상황 및 행동(한 칸)</b>만 작성하면, 2024 개정 표준보육과정(영아) 흐름에 맞춰
+      <b>①관찰내용(현재진행형)</b>을 <b>기본형/확장형</b>으로 선택 생성하고, ②~⑤는 기존 구조로 함께 생성합니다.<br/>
+      ※ 본 도구는 브라우저에서만 동작하며, 입력 내용은 외부로 전송되지 않습니다.
+    </p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin:0 0 10px;font-size:16px;">입력 (교사가 작성하는 3가지)</h2>
+
+      <div class="row">
+        <div class="col">
+          <label>연령</label>
+          <select id="age">
+            <option value="0">만 0세</option>
+            <option value="1">만 1세</option>
+            <option value="2">만 2세</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>성별</label>
+          <select id="gender">
+            <option value="남">남</option>
+            <option value="여">여</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>이름 표기</label>
+          <select id="nameStyle">
+            <option value="OOO">OOO</option>
+            <option value="OOO()">OOO(연령·성별 표기)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>상황 및 행동 (한 칸에 같이 기록)</label>
+        <textarea id="inputText" placeholder="예) 교사가 “응가했나 볼까요?”라고 말하자 자신의 기저귀가 있는 곳을 가리킨다. 교사가 엄지척을 해주고 “기저귀를 찾았네”라고 말하며 칭찬한다. 기저귀를 갈아주자 활짝 웃는다."></textarea>
+      </div>
+
+      <div style="margin-top:8px">
+        <label>① 관찰내용 스타일 선택</label>
+        <div class="radio">
+          <label><input type="radio" name="obsMode" value="basic" checked> 기본형(6~8줄)</label>
+          <label><input type="radio" name="obsMode" value="expanded"> 확장형(10~14줄)</label>
+          <label><input type="radio" name="obsMode" value="both"> 둘 다 생성</label>
+        </div>
+        <div class="small">
+          - 기본형: 바쁜 날 빠른 기록용<br/>
+          - 확장형: 대화/표정/시선/행동 흐름을 더 자세히 기록
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="genBtn">관찰일지 생성하기</button>
+        <button class="ghost" id="resetBtn" type="button">초기화</button>
+      </div>
+
+      <div class="chips">
+        <span class="chip">①은 “~하고 있다” 금지</span>
+        <span class="chip">①은 관찰만(교사 생각 금지)</span>
+        <span class="chip">① 정리 문장 3개 고정</span>
+      </div>
+    </div>
+
+    <div class="card out">
+      <h2>결과</h2>
+      <div class="meta">
+        <span class="pill" id="currArea">표준보육과정 관련영역(주): -</span>
+        <span class="pill" id="currSub">보조(연결): -</span>
+      </div>
+
+      <div class="btns" style="margin-top:0">
+        <button class="primary" id="copyBtn" type="button">전체 복사</button>
+      </div>
+
+      <div class="section">
+        <h3>① 관찰내용 (현재진행형 기록)</h3>
+        <div class="box" id="obsBox">-</div>
+      </div>
+
+      <div class="section">
+        <h3>② 교사의 해석 (관찰과 연결하여)</h3>
+        <div class="box" id="interpretBox">-</div>
+      </div>
+
+      <div class="section">
+        <h3>③ 교사의 지원계획 (보완·확장)</h3>
+        <div class="box" id="planBox">-</div>
+      </div>
+
+      <div class="section">
+        <h3>④ 가정과의 연계 (부모 안내: 왜/어떻게/아이에게 어떤 영향)</h3>
+        <div class="box" id="homeBox">-</div>
+      </div>
+
+      <div class="section">
+        <h3>⑤ 발달평가 및 다음 관찰 포인트 (의미 있는 변화·강점·다음)</h3>
+        <div class="box" id="evalBox">-</div>
+      </div>
+
+      <div class="small">
+        ※ ①은 “눈앞에서 보이는 것” 중심으로, ②~⑤에서 교사의 해석과 계획을 확장합니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/** =============================
+ *  유틸
+ * ============================= */
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function pick(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function uniq(arr){
+  return [...new Set(arr)];
+}
+
+function normalizeQuotes(s){
+  if(!s) return "";
+  return s
+    .replaceAll("“","\"").replaceAll("”","\"")
+    .replaceAll("‘","'").replaceAll("’","'")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function splitSentences(s){
+  s = normalizeQuotes(s);
+  // 문장 분리(마침표/물음표/느낌표/줄바꿈 기준)
+  const raw = s
+    .replace(/\n+/g, " ")
+    .split(/(?<=[\.\?\!]|다\.)\s+|(?<=다)\s+(?=[가-힣A-Za-z0-9"'])/g)
+    .map(x=>x.trim())
+    .filter(Boolean);
+
+  // 너무 긴 경우 보완: '라고' 중심으로 한번 더 나눔
+  const out = [];
+  raw.forEach(r=>{
+    if(r.length > 130 && r.includes("라고")){
+      const parts = r.split(/(?<=라고)\s+/g).map(x=>x.trim()).filter(Boolean);
+      out.push(...parts);
+    } else out.push(r);
+  });
+  return out.filter(Boolean);
+}
+
+function extractDialogs(s){
+  s = normalizeQuotes(s);
+  const dialogs = [];
+  const re = /"([^"]{1,80})"/g;
+  let m;
+  while((m = re.exec(s)) !== null){
+    dialogs.push(m[1]);
+  }
+  return dialogs.slice(0, 6);
+}
+
+/** =============================
+ *  영역 추정 (아주 단순한 현장용 룰)
+ *  - 필요하면 키워드 더 추가하면 됨
+ * ============================= */
+function inferArea(text){
+  const t = normalizeQuotes(text);
+  const has = (...ks)=>ks.some(k=>t.includes(k));
+
+  // 생활루틴/위생/배변/식사
+  if(has("기저귀","응가","쉬","변기","배변","대변","소변","세면","손씻","손 씻","휴지","닦","물티슈","씻","비누")){
+    return {
+      main: "신체운동·건강 · 기본생활(위생/배변)·안전·건강한 생활",
+      sub: "사회관계 · 교사와 안정적 관계·도움 요청/수용"
+    };
+  }
+  if(has("이유식","맘마","밥","간식","먹","숟가락","컵","물","마신")){
+    return {
+      main: "신체운동·건강 · 기본생활(식사)·건강한 생활",
+      sub: "의사소통 · 말·몸짓에 반응·요구 표현"
+    };
+  }
+  if(has("블록","퍼즐","끼워","맞추","정리","쌓","굴리","탐색","만지","살펴")){
+    return {
+      main: "자연탐구 · 탐색·문제해결·감각 경험",
+      sub: "신체운동·건강 · 소근육 조절"
+    };
+  }
+  if(has("그리","색칠","크레파스","물감","종이","스티커","붙이")){
+    return {
+      main: "예술경험 · 미술놀이·표현",
+      sub: "자연탐구 · 감각 탐색"
+    };
+  }
+  if(has("친구","같이","주고","받","기다","차례","도와","안아","손잡")){
+    return {
+      main: "사회관계 · 또래와의 관계·함께하기",
+      sub: "의사소통 · 상호작용·표현"
+    };
+  }
+  // 기본값
+  return {
+    main: "의사소통 · 교사와 상호작용·말/몸짓으로 표현",
+    sub: "사회관계 · 안정적 관계·정서 표현"
+  };
+}
+
+/** =============================
+ *  ① 관찰내용 생성 규칙
+ *  - “~하고 있다” 금지
+ *  - 관찰만(기대/흥미/의도 등 교사 생각 단어 금지)
+ *  - 대화는 " "로 포함
+ *  - 기본형 6~8줄 / 확장형 10~14줄
+ *  - 마지막에 정리 문장 3개(하이픈)
+ * ============================= */
+const OBS_VERBS = [
+  "바라본다","살펴본다","둘러본다","미소를 짓는다","환하게 웃는다","옹알이한다",
+  "손을 뻗는다","손가락으로 가리킨다","고개를 든다","다가간다","앉는다","일어난다",
+  "움직인다","손뼉을 친다","잡는다","놓는다","건넨다","받는다","말한다","소리를 낸다",
+  "몸을 비튼다","몸을 뻗는다","눈을 동그랗게 뜬다","교사를 본다","고개를 끄덕인다"
+];
+
+function nameLabel(age, gender, nameStyle){
+  if(nameStyle === "OOO()"){
+    return `OOO(${age}세 ${gender})`;
+  }
+  return "OOO";
+}
+
+function cleanNotObservedPhrases(line){
+  // 관찰내용에서 "기대감/흥미/의도/참여하고 있다/나타나고 있다/연결되고 있다" 계열 줄이기
+  // “~하고 있다”는 아예 생성 단계에서 피하지만, 혹시 들어오면 교정
+  return line
+    .replace(/하고 있다/g,"한다")
+    .replace(/하고있다/g,"한다")
+    .replace(/나타나고 있다/g,"나타난다")
+    .replace(/참여하고 있다/g,"참여한다")
+    .replace(/연결되고 있다/g,"연결된다")
+    .replace(/반응하고 있다/g,"반응한다")
+    .replace(/따라가고 있다/g,"따라간다")
+    .replace(/바라보고 있다/g,"바라본다")
+    .replace(/움직이고 있다/g,"움직인다")
+    .replace(/기대감을 표현한다/g,"소리를 내고 미소를 짓는다"); // 관찰형으로 치환
+}
+
+function buildObservationLines(text, age, gender, mode, nameStyle){
+  const nm = nameLabel(age, gender, nameStyle);
+  const t = normalizeQuotes(text);
+  const dialogs = extractDialogs(t);
+  const sents = splitSentences(t);
+
+  // 사건 키워드 기반 "장면 뼈대" 생성
+  const has = (...ks)=>ks.some(k=>t.includes(k));
+
+  // 사용자 입력에서 이미 명확한 행동이 있으면 그것을 우선 반영
+  const coreFacts = [];
+  if(sents.length){
+    // 입력문을 관찰형으로 자연스럽게 재구성: 'OOO는 ~' 형태로 2~3개로 압축
+    // (완전 추출 NLP는 안 쓰고, 핵심 키워드 중심으로)
+    const important = sents.slice(0, clamp(sents.length, 2, 4));
+    important.forEach(p=>{
+      // 너무 "교사 생각" 단어가 섞이면 빼고, 대사는 유지
+      coreFacts.push(p);
+    });
+  }
+
+  // 기본 장면 추가 문장(관찰 전용)
+  const scene = [];
+  if(has("기저귀","응가","쉬","변기","배변","세면","손씻","손 씻","비누","휴지","물티슈")){
+    // 배변/기저귀 루틴
+    scene.push(`${nm}는 교사의 목소리를 듣고 고개를 든다.`);
+    if(dialogs[0]) scene.push(`교사가 "${dialogs[0]}"라고 말하자 ${nm}는 교사를 본다.`);
+    scene.push(`${nm}는 기저귀가 있는 쪽을 손가락으로 가리킨다.`);
+    scene.push(`교사가 엄지손가락을 들어 보이며 말을 건넨다.`);
+    scene.push(`${nm}는 교사의 얼굴을 바라보고 미소를 짓는다.`);
+    scene.push(`교사가 ${nm}의 기저귀를 준비하며 가까이 다가간다.`);
+    scene.push(`${nm}는 교사의 손 움직임을 바라본다.`);
+    scene.push(`기저귀를 가는 동안 ${nm}는 몸을 약간 움직이며 자세를 바꾼다.`);
+    scene.push(`교사가 말을 건네자 ${nm}는 소리를 내거나 옹알이를 한다.`);
+    scene.push(`기저귀 교체가 끝나자 ${nm}는 환하게 웃으며 교사를 본다.`);
+  } else if(has("이유식","맘마","숟가락","밥","먹","간식")){
+    scene.push(`${nm}는 교사의 손을 바라보다가 고개를 든다.`);
+    scene.push(`교사가 음식 준비를 하자 ${nm}는 교사의 얼굴을 번갈아 본다.`);
+    if(dialogs[0]) scene.push(`교사가 "${dialogs[0]}"라고 말하자 ${nm}는 소리를 내며 교사를 본다.`);
+    scene.push(`교사가 숟가락을 보여주자 ${nm}는 입을 벌린다.`);
+    scene.push(`${nm}는 숟가락이 가까워지자 입을 크게 벌려 받아먹는다.`);
+    scene.push(`${nm}는 다음 한 입을 기다리며 숟가락과 그릇을 바라본다.`);
+    scene.push(`${nm}는 숟가락을 잡으려고 손을 뻗는다.`);
+    scene.push(`교사가 함께 잡아주자 ${nm}는 숟가락을 입 쪽으로 옮긴다.`);
+    scene.push(`${nm}는 먹은 뒤 교사를 보고 미소를 짓는다.`);
+  } else {
+    // 일반 놀이/상호작용
+    scene.push(`${nm}는 교사의 목소리를 듣고 고개를 든다.`);
+    scene.push(`${nm}는 주변을 둘러본다.`);
+    scene.push(`교사가 말을 건네자 ${nm}는 교사를 본다.`);
+    scene.push(`${nm}는 손을 뻗거나 물건을 잡는다.`);
+    scene.push(`${nm}는 물건을 만지며 살펴본다.`);
+    scene.push(`${nm}는 미소를 짓거나 소리를 낸다.`);
+    scene.push(`교사가 가까이 다가가자 ${nm}는 시선을 옮겨 교사를 본다.`);
+  }
+
+  // 사용자 입력에 있는 대사를 최대한 관찰 내용에 포함(최대 2개)
+  const dialogLines = [];
+  if(dialogs.length){
+    const use = dialogs.slice(0,2);
+    use.forEach(d=>{
+      // 교사/아이 대사 구분을 굳이 추론하지 않고 "교사가"로 안정 처리
+      dialogLines.push(`교사가 "${d}"라고 말한다.`);
+    });
+  } else {
+    // 사용자가 대사를 안 넣은 경우, 관찰내용에 "교사 생각"이 아닌 중립 대사 1개만(선택적)
+    // 여기서는 아예 넣지 않는 편이 안전. (원하시면 옵션으로 켤 수 있음)
+  }
+
+  // 핵심 행동을 “OOO는 ~한다” 형태로 정돈: coreFacts를 섞되, 관찰형으로 전환
+  const refinedFacts = [];
+  coreFacts.forEach(f=>{
+    let line = f;
+    // "교사가"로 시작하면 그대로, 아니면 OOO 주어 부여
+    if(!/^교사가/.test(line) && !line.startsWith(nm)){
+      line = `${nm}는 ${line}`;
+    }
+    // 관찰 부적합 표현 일부 교정
+    line = line
+      .replace(/기대감|흥미|의도|집중|즐거워|신나|좋아하/g, ""); // 생각 단어는 제거(문장 어색하면 아래에서 보정)
+    line = line.replace(/\s{2,}/g," ").trim();
+    if(line.length < 6) return;
+    refinedFacts.push(line.endsWith(".") ? line : (line + "."));
+  });
+
+  // 최종 라인 조합
+  const target = (mode === "expanded") ? {min:10,max:14} : {min:6,max:8};
+  let lines = [];
+
+  // 1) 장면 2~3줄
+  lines.push(...scene.slice(0,3));
+
+  // 2) 입력에서 정돈한 사실 2~4줄(가능하면)
+  lines.push(...refinedFacts.slice(0, (mode === "expanded") ? 4 : 2));
+
+  // 3) 대사 0~2줄(대사가 있으면 포함)
+  lines.push(...dialogLines.slice(0, (mode === "expanded") ? 2 : 1));
+
+  // 4) 장면 보강: 확장형은 더 많이
+  const remainScene = (mode === "expanded") ? scene.slice(3) : scene.slice(3, 6);
+  lines.push(...remainScene);
+
+  // 길이 맞추기(너무 길면 자르고, 짧으면 중립 관찰문 추가)
+  lines = lines.map(cleanNotObservedPhrases).filter(Boolean);
+
+  // 중복 줄 제거(간단히)
+  lines = uniq(lines);
+
+  // 확장형/기본형 길이 맞춤
+  while(lines.length < target.min){
+    const v = pick(OBS_VERBS);
+    // 관찰 가능한 중립 문장만 추가
+    const extra = `${nameLabel(age, gender, nameStyle)}는 교사를 보고 ${v}.`;
+    const fixed = cleanNotObservedPhrases(extra).replace(/보고 바라본다\./g,"바라본다.");
+    if(!lines.includes(fixed)) lines.push(fixed);
+    if(lines.length > target.max) break;
+  }
+  if(lines.length > target.max){
+    lines = lines.slice(0, target.max);
+  }
+
+  // 마지막 3개 요약 문장(하이픈) — 관찰정리 3개 고정
+  // (키워드에 따라 내용이 달라지도록)
+  const bullets = [];
+  if(has("가리키","손가락","가르키")){
+    bullets.push("- 교사의 질문에 손가락으로 위치를 가리키는 행동을 보인다.");
+  } else {
+    bullets.push("- 교사의 말에 시선을 옮기고 교사를 바라보는 모습을 보인다.");
+  }
+
+  if(has("웃","미소")){
+    bullets.push("- 교사의 말과 몸짓에 미소와 표정으로 반응하는 모습을 보인다.");
+  } else {
+    bullets.push("- 교사의 말과 몸짓에 시선과 몸의 움직임으로 반응하는 모습을 보인다.");
+  }
+
+  if(has("기저귀","배변","응가","쉬")){
+    bullets.push("- 기저귀 교체 과정에서 교사의 얼굴과 손을 바라보며 활동을 이어간다.");
+  } else if(has("먹","이유식","숟가락")){
+    bullets.push("- 식사 과정에서 숟가락과 교사의 손을 바라보며 먹기 활동을 이어간다.");
+  } else {
+    bullets.push("- 활동 과정에서 교사의 안내에 맞춰 몸을 움직이며 놀이를 이어간다.");
+  }
+
+  // 결과 문자열
+  const body = lines.join("\n");
+  const summary = bullets.slice(0,3).join("\n");
+  return `${body}\n\n${summary}`;
+}
+
+function buildObservation(text, age, gender, obsMode, nameStyle){
+  if(obsMode === "both"){
+    const basic = buildObservationLines(text, age, gender, "basic", nameStyle);
+    const exp = buildObservationLines(text, age, gender, "expanded", nameStyle);
+    return `【기본형】\n${basic}\n\n--------------------\n\n【확장형】\n${exp}`;
+  }
+  return buildObservationLines(text, age, gender, obsMode, nameStyle);
+}
+
+/** =============================
+ *  ②~⑤ 생성 (기존 구조 유지용)
+ *  - ①에서 “관찰 사실”을 토대로 해석/계획/가정연계를 자연스럽게 연결
+ * ============================= */
+function buildInterpretation(area, text){
+  const t = normalizeQuotes(text);
+  // 해석에서는 생각 단어 사용 가능
+  if(area.main.includes("배변") || t.includes("기저귀") || t.includes("응가") || t.includes("쉬")){
+    return [
+      "배변·위생 루틴에서 교사의 질문에 반응하고, 필요한 물건의 위치를 몸짓으로 알려주는 모습이 나타난다.",
+      "교사의 칭찬과 얼굴 표정을 확인하며 정서적으로 안정감을 느끼고, 일상 활동의 흐름을 익히는 과정으로 해석할 수 있다."
+    ].join("\n");
+  }
+  if(t.includes("이유식") || t.includes("먹") || t.includes("숟가락")){
+    return [
+      "식사 상황에서 교사의 안내를 듣고 시선과 표정으로 반응하며 먹기 활동에 참여하는 모습이 나타난다.",
+      "도구(숟가락)를 잡으려는 시도는 ‘스스로 해보려는 자율성’이 자라나는 과정으로 해석할 수 있다."
+    ].join("\n");
+  }
+  return [
+    "교사의 말과 몸짓에 시선·표정·몸의 움직임으로 반응하며 상호작용을 이어가는 모습이 나타난다.",
+    "활동 중 반복되는 행동은 익숙한 흐름을 통해 안정감을 느끼고 참여를 확장하는 과정으로 해석할 수 있다."
+  ].join("\n");
+}
+
+function buildPlan(area, text){
+  const t = normalizeQuotes(text);
+  if(area.main.includes("배변") || t.includes("기저귀")){
+    return [
+      "① 예측 가능한 루틴 제공: “확인→준비→교체→마무리(손씻기)” 순서를 같은 말로 반복해 안내한다.",
+      "② 선택 제공: “누워볼까/서서 해볼까”, “휴지를 먼저 잡아볼까”처럼 작은 선택을 주어 참여를 확장한다.",
+      "③ 몸짓·표현 강화: 가리키기/옹알이/표정이 나타나면 즉시 “여기 기저귀네”, “찾았네”처럼 구체적으로 언어화한다."
+    ].join("\n");
+  }
+  if(t.includes("먹") || t.includes("이유식") || t.includes("숟가락")){
+    return [
+      "① 도구 사용 확장: 숟가락을 잡는 손 위에 교사가 손을 얹어 ‘함께 잡기→부분 도움→혼자 잡기’로 단계화한다.",
+      "② 기다림/차례 경험: 한 입–잠깐 멈춤–다음 한 입의 리듬을 만들고, 아이의 신호(입 벌리기/손 뻗기)에 맞춰 제공한다.",
+      "③ 의사표현 강화: “더/그만/물” 등 짧은 말이나 손짓이 나오면 즉시 반응하며 표현을 안정적으로 연결한다."
+    ].join("\n");
+  }
+  return [
+    "① 교사-영아 상호작용 강화: 아이가 바라보거나 다가오면 즉시 눈맞춤과 짧은 말로 반응한다.",
+    "② 반복과 확장: 아이가 반복하는 행동을 동일하게 따라준 뒤, 한 가지 변화를 더해 놀이를 확장한다.",
+    "③ 도움 요청/수용 경험: 도움이 필요해 보이는 순간에 ‘짧게 돕고’ 아이의 시도를 기다리며 성취 경험을 만든다."
+  ].join("\n");
+}
+
+function buildHomeLink(area, text){
+  const t = normalizeQuotes(text);
+  if(area.main.includes("배변") || t.includes("기저귀")){
+    return [
+      "가정에서도 배변·기저귀 교체를 같은 순서와 같은 말로 안내해 주세요(예: “확인해볼까→기저귀 가져오자→갈아보자→손 씻자”).",
+      "아이가 ‘가리키기/소리/표정’으로 신호를 보이면 즉시 “기저귀네, 알려줬구나”처럼 구체적으로 반응해 주세요.",
+      "예측 가능한 루틴과 따뜻한 반응이 반복되면 일상 활동 참여가 안정되고, 스스로 표현하려는 행동이 더 늘어납니다."
+    ].join("\n");
+  }
+  if(t.includes("먹") || t.includes("이유식") || t.includes("숟가락")){
+    return [
+      "가정에서도 식사 시간을 일정하게 유지하고, ‘같은 자리·같은 순서’로 진행해 주세요.",
+      "아이가 숟가락을 잡으려 하면 손 위에 살짝 손을 얹어 함께 잡아주고, 조금씩 도움을 줄여 혼자 시도할 시간을 주세요.",
+      "이 과정이 반복되면 자율적 먹기 행동이 늘고, 표현(더/그만)의 신호도 더 분명해집니다."
+    ].join("\n");
+  }
+  return [
+    "가정에서도 아이가 바라보거나 다가올 때 눈맞춤과 짧은 말로 반응해 주세요.",
+    "아이의 행동을 먼저 따라해 준 뒤(모방), 한 가지 변화를 더해 놀이를 이어가면 확장이 쉬워집니다.",
+    "따뜻한 상호작용이 반복되면 안정감이 높아지고, 새로운 활동에도 참여하려는 시도가 늘어납니다."
+  ].join("\n");
+}
+
+function buildEvalAndNext(area, text){
+  const t = normalizeQuotes(text);
+  if(area.main.includes("배변") || t.includes("기저귀")){
+    return [
+      "발달평가: 교사의 질문에 반응하고, 필요한 물건의 위치를 몸짓으로 알려주는 시도가 나타난다. 교사의 반응을 확인하며 정서적으로 안정된 모습도 보인다.",
+      "다음 관찰 포인트: (1) 배변 신호의 표현 방식(가리키기/소리/표정) 변화, (2) 루틴 단계에서의 참여 범위(준비/교체/마무리), (3) 마무리 활동(손씻기 등)으로의 전환 반응을 확인한다."
+    ].join("\n");
+  }
+  if(t.includes("먹") || t.includes("이유식") || t.includes("숟가락")){
+    return [
+      "발달평가: 먹기 상황에서 교사의 안내에 반응하며 활동을 지속하고, 도구를 잡으려는 시도가 나타난다.",
+      "다음 관찰 포인트: (1) 숟가락 잡기 도움의 정도 변화(함께→부분→혼자), (2) ‘더/그만’과 같은 의사표현 신호, (3) 식사 리듬(기다림/차례)에 대한 반응을 확인한다."
+    ].join("\n");
+  }
+  return [
+    "발달평가: 교사의 말과 몸짓에 반응하며 상호작용을 이어가고, 익숙한 흐름에서 참여가 안정적으로 나타난다.",
+    "다음 관찰 포인트: (1) 반응 방식(시선/표정/몸짓)의 다양화, (2) 반복 행동의 확장 정도, (3) 도움 요청/수용의 변화(기다리기/손 내밀기 등)를 확인한다."
+  ].join("\n");
+}
+
+/** =============================
+ *  전체 생성
+ * ============================= */
+function buildAll(){
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+  const nameStyle = document.getElementById("nameStyle").value;
+  const input = document.getElementById("inputText").value.trim();
+  const obsMode = [...document.querySelectorAll("input[name='obsMode']")].find(r=>r.checked)?.value || "basic";
+
+  if(!input){
+    alert("상황 및 행동 내용을 입력해 주세요.");
+    return;
+  }
+
+  const area = inferArea(input);
+  document.getElementById("currArea").textContent = `표준보육과정 관련영역(주): ${area.main}`;
+  document.getElementById("currSub").textContent  = `보조(연결): ${area.sub}`;
+
+  // ①
+  const obs = buildObservation(input, age, gender, obsMode, nameStyle);
+  document.getElementById("obsBox").textContent = obs;
+
+  // ②~⑤
+  document.getElementById("interpretBox").textContent = buildInterpretation(area, input);
+  document.getElementById("planBox").textContent = buildPlan(area, input);
+  document.getElementById("homeBox").textContent = buildHomeLink(area, input);
+  document.getElementById("evalBox").textContent = buildEvalAndNext(area, input);
+}
+
+function resetAll(){
+  document.getElementById("inputText").value = "";
+  document.getElementById("currArea").textContent = "표준보육과정 관련영역(주): -";
+  document.getElementById("currSub").textContent = "보조(연결): -";
+  ["obsBox","interpretBox","planBox","homeBox","evalBox"].forEach(id=>{
+    document.getElementById(id).textContent = "-";
+  });
+  // 기본형으로 되돌리기
+  document.querySelectorAll("input[name='obsMode']").forEach(r=>{
+    r.checked = (r.value === "basic");
+  });
+}
+
+async function copyAll(){
+  const parts = [];
+  parts.push("① 관찰내용 (현재진행형 기록)\n" + document.getElementById("obsBox").textContent);
+  parts.push("\n\n② 교사의 해석 (관찰과 연결하여)\n" + document.getElementById("interpretBox").textContent);
+  parts.push("\n\n③ 교사의 지원계획 (보완·확장)\n" + document.getElementById("planBox").textContent);
+  parts.push("\n\n④ 가정과의 연계 (부모 안내: 왜/어떻게/아이에게 어떤 영향)\n" + document.getElementById("homeBox").textContent);
+  parts.push("\n\n⑤ 발달평가 및 다음 관찰 포인트 (의미 있는 변화·강점·다음)\n" + document.getElementById("evalBox").textContent);
+  const text = parts.join("");
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("전체 내용을 복사했어요.");
+  }catch(e){
+    // clipboard API가 막힌 환경 대응
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("전체 내용을 복사했어요.");
+  }
+}
+
+document.getElementById("genBtn").addEventListener("click", buildAll);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+document.getElementById("copyBtn").addEventListener("click", copyAll);
+</script>
+</body>
+</html>
